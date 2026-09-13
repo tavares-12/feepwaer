@@ -1,1 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FeePwear — Moda Esportiva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo" onclick="showPage('home')">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">Fee<span>Pwear</span></span>
+      </a>
 
+      <nav class="nav" id="mainNav">
+        <a href="#" onclick="showPage('home')">Início</a>
+        <a href="#" onclick="showPage('catalog')">Catálogo</a>
+        <a href="#" onclick="showPage('about')">Sobre</a>
+        <a href="#" onclick="showPage('contact')">Contato</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showPage('cart')" title="Carrinho">
+          🛒 <span class="badge" id="cartBadge">0</span>
+        </button>
+        <button class="icon-btn" id="userBtn" onclick="toggleUserMenu()" title="Conta">
+          👤
+        </button>
+        <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- USER MENU DROPDOWN -->
+  <div class="user-menu" id="userMenu">
+    <div id="userMenuContent"></div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main id="app">
+    <!-- HOME -->
+    <section id="page-home" class="page active">
+      <div class="hero">
+        <div class="container hero-content">
+          <h1>Moda Esportiva<br><span>de Alta Performance</span></h1>
+          <p>Camisetas, calças e tênis pensados para quem treina sério e vive o estilo urbano.</p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="showPage('catalog')">Ver Catálogo</button>
+            <button class="btn btn-outline" onclick="showPage('about')">Conheça a marca</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container section">
+        <h2 class="section-title">Categorias</h2>
+        <div class="categories-grid">
+          <div class="category-card" onclick="filterCategory('camisetas')">
+            <div class="cat-icon">👕</div>
+            <h3>Camisetas</h3>
+            <p>Dry-fit, oversized e performance</p>
+          </div>
+          <div class="category-card" onclick="filterCategory('calcas')">
+            <div class="cat-icon">👖</div>
+            <h3>Calças</h3>
+            <p>Jogger, legging e moletom</p>
+          </div>
+          <div class="category-card" onclick="filterCategory('tenis')">
+            <div class="cat-icon">👟</div>
+            <h3>Tênis</h3>
+            <p>Running, casual e high performance</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="container section">
+        <h2 class="section-title">Destaques</h2>
+        <div class="products-grid" id="featuredProducts"></div>
+      </div>
+    </section>
+
+    <!-- CATALOG -->
+    <section id="page-catalog" class="page">
+      <div class="container section">
+        <div class="catalog-header">
+          <h2 class="section-title">Catálogo</h2>
+          <div class="filters">
+            <button class="filter-btn active" data-cat="all" onclick="filterCategory('all')">Todos</button>
+            <button class="filter-btn" data-cat="camisetas" onclick="filterCategory('camisetas')">Camisetas</button>
+            <button class="filter-btn" data-cat="calcas" onclick="filterCategory('calcas')">Calças</button>
+            <button class="filter-btn" data-cat="tenis" onclick="filterCategory('tenis')">Tênis</button>
+          </div>
+        </div>
+        <div class="products-grid" id="catalogProducts"></div>
+      </div>
+    </section>
+
+    <!-- PRODUCT DETAIL -->
+    <section id="page-product" class="page">
+      <div class="container section">
+        <button class="btn btn-ghost" onclick="showPage('catalog')">← Voltar ao catálogo</button>
+        <div class="product-detail" id="productDetail"></div>
+      </div>
+    </section>
+
+    <!-- CART -->
+    <section id="page-cart" class="page">
+      <div class="container section">
+        <h2 class="section-title">Meu Carrinho</h2>
+        <div id="cartContent"></div>
+      </div>
+    </section>
+
+    <!-- CHECKOUT -->
+    <section id="page-checkout" class="page">
+      <div class="container section">
+        <h2 class="section-title">Finalizar Pedido</h2>
+        <div class="checkout-grid">
+          <form id="checkoutForm" class="checkout-form" onsubmit="placeOrder(event)">
+            <div class="form-group">
+              <label>Nome completo *</label>
+              <input type="text" id="orderName" required placeholder="Seu nome">
+            </div>
+            <div class="form-group">
+              <label>WhatsApp / Telefone *</label>
+              <input type="tel" id="orderPhone" required placeholder="(11) 99999-9999">
+            </div>
+            <div class="form-group">
+              <label>E-mail</label>
+              <input type="email" id="orderEmail" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+              <label>Endereço completo *</label>
+              <textarea id="orderAddress" required rows="3" placeholder="Rua, número, bairro, cidade - CEP"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Observações</label>
+              <textarea id="orderNotes" rows="2" placeholder="Tamanho, cor preferida, etc."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Confirmar Pedido</button>
+          </form>
+          <div class="order-summary" id="orderSummary"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDER SUCCESS -->
+    <section id="page-success" class="page">
+      <div class="container section text-center">
+        <div class="success-box">
+          <div class="success-icon">✅</div>
+          <h2>Pedido realizado com sucesso!</h2>
+          <p>Seu pedido <strong id="orderIdDisplay"></strong> foi registrado.</p>
+          <p class="text-muted">Agora você pode falar conosco pelo WhatsApp:</p>
+          <div class="whatsapp-actions" id="whatsappActions"></div>
+          <button class="btn btn-outline mt-3" onclick="showPage('home')">Voltar ao início</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section id="page-login" class="page">
+      <div class="container section">
+        <div class="auth-box">
+          <h2>Entrar na sua conta</h2>
+          <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label>Nome</label>
+              <input type="text" id="loginName" required placeholder="Seu nome">
+            </div>
+            <div class="form-group">
+              <label>E-mail</label>
+              <input type="email" id="loginEmail" required placeholder="seu@gmail.com ou outro">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+          </form>
+          <div class="divider">ou</div>
+          <button class="btn btn-google btn-block" onclick="loginWithGoogle()">
+            <span>G</span> Continuar com Google
+          </button>
+          <p class="auth-footer">
+            <a href="#" onclick="showPage('admin-login')">Acesso Desenvolvedor</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN LOGIN -->
+    <section id="page-admin-login" class="page">
+      <div class="container section">
+        <div class="auth-box">
+          <h2>Área do Desenvolvedor</h2>
+          <form onsubmit="handleAdminLogin(event)">
+            <div class="form-group">
+              <label>Senha</label>
+              <input type="password" id="adminPassword" required placeholder="Digite a senha">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+          </form>
+          <p class="auth-footer">
+            <a href="#" onclick="showPage('login')">← Voltar</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN DASHBOARD -->
+    <section id="page-admin" class="page">
+      <div class="container section">
+        <div class="admin-header">
+          <h2 class="section-title">Painel do Desenvolvedor</h2>
+          <button class="btn btn-outline" onclick="logoutAdmin()">Sair do Admin</button>
+        </div>
+        <div id="adminContent"></div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="page-about" class="page">
+      <div class="container section">
+        <h2 class="section-title">Sobre a FeePwear</h2>
+        <div class="about-content">
+          <p>A <strong>FeePwear</strong> nasceu da paixão por esporte e estilo urbano. Oferecemos peças de alta qualidade focadas em performance, conforto e visual moderno.</p>
+          <p>Trabalhamos exclusivamente com <strong>Camisetas</strong>, <strong>Calças</strong> e <strong>Tênis</strong> — tudo pensado para quem treina e vive o dia a dia com atitude.</p>
+          <p>Nosso compromisso é entregar produtos que unem tecnologia de tecidos (dry-fit, compressão) com o estilo streetwear que você procura.</p>
+          <div class="about-stats">
+            <div><strong>100%</strong><span>Foco em performance</span></div>
+            <div><strong>3</strong><span>Categorias principais</span></div>
+            <div><strong>WhatsApp</strong><span>Atendimento rápido</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="page-contact" class="page">
+      <div class="container section">
+        <h2 class="section-title">Contato</h2>
+        <div class="contact-grid">
+          <div>
+            <h3>Fale conosco</h3>
+            <p>Dúvidas sobre produtos, tamanhos ou pedidos? Estamos prontos para te atender.</p>
+            <p><strong>WhatsApp:</strong> clique no botão abaixo</p>
+            <a id="contactWhatsapp" href="#" target="_blank" class="btn btn-primary">Conversar no WhatsApp</a>
+          </div>
+          <div>
+            <h3>Horário de atendimento</h3>
+            <p>Segunda a Sexta: 9h às 18h<br>Sábado: 9h às 13h</p>
+            <h3 class="mt-2">Redes</h3>
+            <p>Em breve Instagram e TikTok oficiais.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="logo"><span class="logo-icon">⚡</span> Fee<span>Pwear</span></div>
+          <p class="text-muted">Moda esportiva de verdade.</p>
+        </div>
+        <div>
+          <h4>Links</h4>
+          <a href="#" onclick="showPage('home')">Início</a>
+          <a href="#" onclick="showPage('catalog')">Catálogo</a>
+          <a href="#" onclick="showPage('about')">Sobre</a>
+          <a href="#" onclick="showPage('contact')">Contato</a>
+        </div>
+        <div>
+          <h4>Categorias</h4>
+          <a href="#" onclick="filterCategory('camisetas')">Camisetas</a>
+          <a href="#" onclick="filterCategory('calcas')">Calças</a>
+          <a href="#" onclick="filterCategory('tenis')">Tênis</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 FeePwear. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
