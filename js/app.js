@@ -14,6 +14,11 @@ let selectedSize = null;
 let selectedQty = 1;
 let currentFilter = "all";
 
+function formatPrice(price) {
+  if (price === null || price === undefined) return "Sob consulta";
+  return "R$ " + price.toFixed(2).replace(".", ",");
+}
+
 // =====================================================
 // Inicialização
 // =====================================================
@@ -69,11 +74,9 @@ function showPage(pageId) {
   const page = document.getElementById(`page-${pageId}`);
   if (page) page.classList.add("active");
 
-  // Fechar menus
   document.getElementById("userMenu").classList.remove("open");
   document.getElementById("mainNav").classList.remove("open");
 
-  // Ações específicas
   if (pageId === "cart") renderCart();
   if (pageId === "checkout") renderOrderSummary();
   if (pageId === "admin") renderAdmin();
@@ -140,9 +143,9 @@ function productCard(p) {
     <div class="product-card" onclick="openProduct(${p.id})">
       <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x500?text=FeePwear'">
       <div class="product-info">
-        <div class="product-category">${CATEGORIES[p.category]}</div>
+        <div class="product-category">${CATEGORIES[p.category] || p.category}</div>
         <h3>${p.name}</h3>
-        <div class="product-price">R$ ${p.price.toFixed(2).replace(".", ",")}</div>
+        <div class="product-price">${formatPrice(p.price)}</div>
       </div>
     </div>
   `;
@@ -170,9 +173,9 @@ function openProduct(id) {
       <img src="${currentProduct.image}" alt="${currentProduct.name}" onerror="this.src='https://via.placeholder.com/600x700?text=FeePwear'">
     </div>
     <div>
-      <div class="product-category">${CATEGORIES[currentProduct.category]}</div>
+      <div class="product-category">${CATEGORIES[currentProduct.category] || currentProduct.category}</div>
       <h1>${currentProduct.name}</h1>
-      <div class="price">R$ ${currentProduct.price.toFixed(2).replace(".", ",")}</div>
+      <div class="price">${formatPrice(currentProduct.price)}</div>
       <p>${currentProduct.description}</p>
 
       <div class="size-selector">
@@ -261,7 +264,8 @@ function renderCart() {
     return;
   }
 
-  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const hasPrice = cart.every(i => i.price != null);
+  const total = hasPrice ? cart.reduce((sum, i) => sum + i.price * i.qty, 0) : null;
 
   container.innerHTML = `
     ${cart.map((item, idx) => `
@@ -269,7 +273,7 @@ function renderCart() {
         <img src="${item.image}" alt="${item.name}">
         <div class="cart-item-info">
           <h4>${item.name}</h4>
-          <div class="cart-item-meta">Tamanho: ${item.size} • R$ ${item.price.toFixed(2).replace(".", ",")}</div>
+          <div class="cart-item-meta">Tamanho: ${item.size} • ${formatPrice(item.price)}</div>
           <div class="cart-item-actions">
             <div class="qty-control">
               <button onclick="updateCartQty(${idx}, -1)">−</button>
@@ -280,13 +284,13 @@ function renderCart() {
           </div>
         </div>
         <div style="font-weight:700;color:var(--accent);">
-          R$ ${(item.price * item.qty).toFixed(2).replace(".", ",")}
+          ${item.price != null ? formatPrice(item.price * item.qty) : "Sob consulta"}
         </div>
       </div>
     `).join("")}
 
     <div class="cart-total">
-      <div>Total: <span class="total-value">R$ ${total.toFixed(2).replace(".", ",")}</span></div>
+      <div>Total: <span class="total-value">${total != null ? formatPrice(total) : "Sob consulta"}</span></div>
       <button class="btn btn-primary mt-3" onclick="goToCheckout()">Finalizar Compra</button>
     </div>
   `;
@@ -311,19 +315,20 @@ function goToCheckout() {
 
 function renderOrderSummary() {
   const container = document.getElementById("orderSummary");
-  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const hasPrice = cart.every(i => i.price != null);
+  const total = hasPrice ? cart.reduce((sum, i) => sum + i.price * i.qty, 0) : null;
 
   container.innerHTML = `
     <h3>Resumo do Pedido</h3>
     ${cart.map(i => `
       <div class="summary-line">
         <span>${i.qty}x ${i.name} (${i.size})</span>
-        <span>R$ ${(i.price * i.qty).toFixed(2).replace(".", ",")}</span>
+        <span>${formatPrice(i.price != null ? i.price * i.qty : null)}</span>
       </div>
     `).join("")}
     <div class="summary-line summary-total">
       <span>Total</span>
-      <span>R$ ${total.toFixed(2).replace(".", ",")}</span>
+      <span>${total != null ? formatPrice(total) : "Sob consulta"}</span>
     </div>
   `;
 }
@@ -345,7 +350,8 @@ function placeOrder(e) {
   const address = document.getElementById("orderAddress").value.trim();
   const notes = document.getElementById("orderNotes").value.trim();
 
-  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const hasPrice = cart.every(i => i.price != null);
+  const total = hasPrice ? cart.reduce((sum, i) => sum + i.price * i.qty, 0) : null;
   const orderId = "FP" + Date.now().toString().slice(-8);
 
   const order = {
@@ -359,18 +365,17 @@ function placeOrder(e) {
 
   saveOrder(order);
 
-  // Limpar carrinho
   cart = [];
   saveCart();
 
-  // Mostrar sucesso + WhatsApp
   document.getElementById("orderIdDisplay").textContent = orderId;
 
   const itemsText = order.items
-    .map(i => `• ${i.qty}x ${i.name} (${i.size}) - R$ ${(i.price * i.qty).toFixed(2)}`)
+    .map(i => `• ${i.qty}x ${i.name} (${i.size})`)
     .join("\n");
 
-  const baseMsg = `Olá! Sou ${name}.\n\nPedido: *${orderId}*\nTotal: *R$ ${total.toFixed(2)}*\n\nItens:\n${itemsText}\n\nEndereço: ${address}`;
+  const totalText = total != null ? `Total: *R$ ${total.toFixed(2)}*` : "Total: *Sob consulta*";
+  const baseMsg = `Olá! Sou ${name}.\n\nPedido: *${orderId}*\n${totalText}\n\nItens:\n${itemsText}\n\nEndereço: ${address}`;
 
   const actions = document.getElementById("whatsappActions");
   actions.innerHTML = `
@@ -414,7 +419,6 @@ function handleLogin(e) {
 }
 
 function loginWithGoogle() {
-  // Simulação limpa de login com Google
   const email = prompt("Digite seu e-mail do Google (ex: seunome@gmail.com):");
   if (!email) return;
 
@@ -486,7 +490,7 @@ function renderAdmin() {
           ${o.items.map(i => `${i.qty}x ${i.name} (${i.size})`).join(" • ")}
         </div>
         <div style="font-weight:700;color:var(--accent);margin-top:8px;">
-          Total: R$ ${o.total.toFixed(2).replace(".", ",")}
+          Total: ${o.total != null ? formatPrice(o.total) : "Sob consulta"}
         </div>
         <div style="font-size:0.85rem;color:var(--text-muted);margin-top:6px;">
           Endereço: ${o.customer.address}
